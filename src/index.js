@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 // setup db if need be
 nano.db.create('users', function(err, body){
 	// this lists users by email. used to search the db for logging in
-	nano.db.use('users').insert({
+	nano.db.use('users').insert({ // TODO!! use PUT not POST
 		_id: '_design/users',
 		_rev: '1-8c6878eaf5e7713e85ee57f2639c6954',
 		language: 'javascript',
@@ -39,7 +39,6 @@ nano.db.create('users', function(err, body){
 	});
 });
 nano.db.create('images');
-nano.db.create('jive');
 
 // log all requests to the console
 app.use(morgan('dev'));

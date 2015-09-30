@@ -1,8 +1,8 @@
+couchdb:
+    image: klaemo/couchdb
 web:
     build: .
     ports:
      - "8080:8080"
     links:
      - couchdb
-couchdb:
-    image: klaemo/couchdb
