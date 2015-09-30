@@ -18,8 +18,6 @@ User.findOneByEmail = function(email, callback){
 		else if(!body.rows[0]) callback(err, undefined);
 
 		else callback(null, new User(body.rows[0].key, body.rows[0].value, body.rows[0].id));
-
-		console.log(body);
 	});
 };
 

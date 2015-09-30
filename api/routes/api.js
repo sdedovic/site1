@@ -1,11 +1,9 @@
-var User = require('../models/users');
-// var Images = require('../models/images');
-var config = require('../../config');
-var busboy = require('connect-busboy');
 var jwt = require('jsonwebtoken');
-
+var User = require('../models/users');
+var config = require('../../config');
 var nano = require('nano')(config.couchdb);
-var db = nano.db.use('images');
+var rack = require('hat').rack();
+
 
 module.exports = function(app, express){
 	var apiRouter = express.Router();
@@ -56,13 +54,49 @@ module.exports = function(app, express){
 				res.json({message: 'User Created!'});
 			});
 		});
+	// token verrification
+	apiRouter.use(function(req, res, next){
+		var token = req.body.token || req.query.token || req.headers['x-access-token'];
+		if(token){
+			jwt.verify(token, config.secret, function(err, decoded){
+				if(err)
+					return res.json({
+						success: false,
+						message: 'Failed to authenticate token'
+					});
+				else{
+					req.decoded = decoded;
+					next();
+				}
+			});
+		} else
+			return res.status(403).send({
+				success: false,
+				message: 'No token provided'
+			});
+	});
+
+
 
 	// new image creation
-	apiRouter.post('/images', function(req, res){
-		console.log(req);
-		req.pipe(db.attachment.insert('new', 'rab.jpg', null, 'image/jpg'));
-		res.send('uhhh idk?');
-  	});
+	apiRouter.route('/images')
+		.post(function(req, res){
+			req.pipe(nano.use('images').attachment.insert(rack(), 'image.jpg', null, 'image/jpg'));
+			res.status(200).end();
+	  	})
+	  	.get(function(req, res){
+	  		nano.use('images').list(function(err, body){
+	  			if(err) throw err;
+
+	  			res.json(body);
+	  		});
+	  	});
+
+	  // specific image functions
+	  apiRouter.route('/images/:id')
+	  	.get(function(req, res){
+	  		nano.use('images').attachment.get(req.params.id, 'image.jpg').pipe(res);
+	  	});
 
 	return apiRouter;
 };
