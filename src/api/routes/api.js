@@ -83,8 +83,12 @@ module.exports = function(app, express){
 	// new image creation
 	apiRouter.route('/images')
 		.post(function(req, res){
-			req.pipe(nano.use('images').attachment.insert(rack(), 'image.jpg', null, 'image/jpg'));
-			res.status(200).end();
+			var imageId = rack();
+			req.pipe(nano.use('images').attachment.insert(imageId, 'image.jpg', null, 'image/jpg'));
+			res.json({
+				success: true,
+				image: imageId
+			});
 	  	})
 	  	.get(function(req, res){
 	  		nano.use('images').list(function(err, body){
