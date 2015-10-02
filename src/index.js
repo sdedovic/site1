@@ -21,22 +21,17 @@ app.use(bodyParser.json());
 // 	next();
 // });
 
-// setup db if need be
+// TODO: only create new db's if needed
 nano.db.create('users', function(err, body){
 	// this lists users by email. used to search the db for logging in
-	nano.db.use('users').insert({ // TODO!! use PUT not POST
-		_id: '_design/users',
-		_rev: '1-8c6878eaf5e7713e85ee57f2639c6954',
+	nano.db.use('users').insert({
 		language: 'javascript',
 		views: {
 			email:{
-				map: function(doc) {
-					if(doc.email && doc.password)
-						emit(doc.email, doc.password);
-				}
+				map: "function(doc){if(doc.email && doc.password)emit(doc.email, doc.password);}"
 			}
 		}
-	});
+	}, '_design/users');
 });
 nano.db.create('images');
 
@@ -49,10 +44,6 @@ app.use(morgan('dev'));
 var apiRoutes = require('./api/routes/api')(app, express);
 app.use('/api', apiRoutes);
 
-// catch-all route
-app.get('*', function(req, res) {
-	res.send('No no... no');
-});
 
 // START THE SERVER
 // ===============================
