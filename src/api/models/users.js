@@ -1,9 +1,11 @@
 var config = require('../../config');
 var nano = require('nano')(config.couchdb);
+// TODO: replace bycrpt with scrypt
 var bcrypt = require('bcrypt-nodejs');
 
 var db = nano.db.use('users');
 
+// TODO: add change password or email functionality
 function User(email, password, id){
 	this.email = email;
 	this.password = password;
@@ -25,7 +27,6 @@ User.prototype.save = function(callback){
 	var user = this;
 
 	// TODO: check for existing document
-
 	// Otherwise overwrite/create user
 	bcrypt.hash(user.password, null, null, function(err, hash){
 		if (err) throw err;

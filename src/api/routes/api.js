@@ -4,10 +4,11 @@ var config = require('../../config');
 var nano = require('nano')(config.couchdb);
 var rack = require('hat').rack();
 
-
+// TODO: fogot password
 module.exports = function(app, express){
 	var apiRouter = express.Router();
 
+	// TODO: handle errors better
 	// user login
 	apiRouter.post('/authenticate', function(req, res){
 		User.findOneByEmail(req.body.email, function(err, user){
@@ -41,6 +42,7 @@ module.exports = function(app, express){
 			}
 		});
 	});
+	// TODO: email verrification
 	// new user creation
 	apiRouter.post('/users', function(req, res){
 			var user = new User();
@@ -51,7 +53,7 @@ module.exports = function(app, express){
 			user.save(function(err, body){
 				if(err) console.log(err);
 
-				res.json({message: 'User Created!'});
+				res.json({message: 'User Created!', email: user.email});
 			});
 		});
 	// token verrification
